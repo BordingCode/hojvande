@@ -372,12 +372,24 @@
       fromCenter: !!(opts.storm && opts.storm.fromCenter),
     };
     var state = { size: SIZE, turn: 0, flood: {}, tide: tide, crew: [], enemies: [], shownForecast: [], rng: rng };
+    // PRE-PLACED DEEP WATER: an encounter may declare `deep: [[col,row], ...]` — tiles that are
+    // already DEEP (depth 2) from turn 0. They're visible/telegraphed from the start (rendered as
+    // flooded like any other water), so the player can SHOVE a monster into the sea on turn ONE and
+    // discover the offensive verb (the skull shows on the ghost). NO crew may start on a deep tile
+    // (crew spawn on the bottom row; encounters must keep their deep tiles off it).
+    (encounter.deep || []).forEach(function (p) { state.flood[key(p[0], p[1])] = 2; });
     var uid = 1;
     // crew spawn on the bottom row, spread out (the shore)
     (opts.crew || DATA.CREW).forEach(function (cdef, i) {
       var col = [1, 2, 3, 0, 4][i] != null ? [1, 2, 3, 0, 4][i] : i;
+      var sc = col, sr = SIZE - 1;
+      // safety: never spawn a crew member onto a pre-placed deep tile (would be an un-telegraphed
+      // turn-0 drown). If the chosen shore tile is deep, slide to the nearest dry bottom-row tile.
+      if (depthForTurn(tide, sc, sr, 0) < 2 && (state.flood[key(sc, sr)] || 0) >= 2) {
+        for (var k = 0; k < SIZE; k++) { if ((state.flood[key(k, sr)] || 0) < 2) { sc = k; break; } }
+      }
       state.crew.push({ _uid: uid++, _side: 'crew', id: cdef.id, glyph: cdef.glyph, color: cdef.color,
-        power: cdef.power, swim: !!cdef.swim, name: cdef.name, c: col, r: SIZE - 1, alive: true });
+        power: cdef.power, swim: !!cdef.swim, name: cdef.name, c: sc, r: sr, alive: true });
     });
     encounter.enemies.forEach(function (e) {
       var def = ENEMIES.find(function (d) { return d.id === e[0]; });

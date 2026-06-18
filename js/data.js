@@ -37,9 +37,16 @@
 
   // ---- Encounters: a short escalating run (~4–7 min). Each is one cleared board. ----
   // tide: starting flood ring schedule. `floodStart` = turn the first ring floods.
-  // Enemies given as [enemyId, col, row]. Crew spawn columns chosen by the engine on row 4.
+  // Enemies given as [enemyId, col, row]. Crew spawn columns chosen by the engine on row 4
+  // (deckhand→col1, bosun→col2, diver→col3). An encounter may also declare `deep: [[col,row]]`
+  // — tiles that start as DEEP water (depth 2), visible & telegraphed from turn 0.
   const ENCOUNTERS = [
-    { name: 'Lavvande',   tideStart: 4, tideEvery: 2, enemies: [['crab', 1, 2], ['crab', 3, 2]] },
+    // ENCOUNTER 1 teaches the OFFENSIVE verb on turn ONE: the Deckhand (col 1, row 4) sits directly
+    // below a crab at (1,3), which sits directly below a pre-placed deep tile at (1,2). The player's
+    // first move — shove UP — chains the crab into the sea and DROWNS it (the ghost shows ☠), so they
+    // DISCOVER "I shove monsters into the water." A second crab at (3,2) is the survival beat; the
+    // gentle tide (starts turn 4) is the later clock. Winnable with thought, losable if careless.
+    { name: 'Lavvande',   tideStart: 4, tideEvery: 2, deep: [[1, 2]], enemies: [['crab', 1, 3], ['crab', 3, 2]] },
     { name: 'Strøms.',    tideStart: 3, tideEvery: 2, enemies: [['crab', 0, 1], ['lurker', 4, 1], ['crab', 2, 0]] },
     { name: 'Brænding',   tideStart: 2, tideEvery: 2, enemies: [['brute', 2, 1], ['crab', 0, 0], ['lurker', 4, 0]] },
     { name: 'Revlen',     tideStart: 2, tideEvery: 2, enemies: [['hulk', 2, 2], ['brute', 0, 1], ['crab', 4, 1], ['lurker', 1, 0]] },

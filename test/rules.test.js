@@ -195,6 +195,93 @@ console.log('\n== A run can be WON by shoving (full encounter clear with a smart
   ok('shoving the crab into shallow water drowns it (the weapon works)', pv.drowns.indexOf(s.enemies[0]._uid) >= 0);
 })();
 
+console.log('\n== ONBOARDING: encounter 1 teaches the OFFENSIVE verb on TURN ONE ==');
+(function () {
+  var DATA = require('../js/data.js').HJ_DATA;
+  var enc = DATA.ENCOUNTERS[0];
+  // pre-placed deep water is the teaching mechanism
+  ok('encounter 1 declares a pre-placed deep tile', Array.isArray(enc.deep) && enc.deep.length >= 1);
+  var s = R.newState(enc, { seed: 1 });
+  // no crew may start on a deep tile (would be an un-telegraphed turn-0 drown)
+  ok('no crew starts on a deep tile', s.crew.every(function (u) { return (s.flood[u.c + ',' + u.r] || 0) < 2; }));
+  // there EXISTS a first-move shove by some crew that drowns a crab, and previewShove reports the drown
+  var found = null;
+  s.crew.forEach(function (u) {
+    if (!u.alive) return;
+    ['up', 'down', 'left', 'right'].forEach(function (dir) {
+      var pv = R.previewShove(s, u._uid, dir, u.power);
+      if (!pv || pv.blocked) return;
+      var drownsEnemy = pv.drowns.some(function (uid) { var x = R.byUid(s, uid); return x && x._side === 'enemy'; });
+      var drownsCrew = pv.drowns.some(function (uid) { var x = R.byUid(s, uid); return x && x._side === 'crew'; });
+      if (drownsEnemy && !drownsCrew && !found) found = { uid: u._uid, dir: dir, power: u.power, pv: pv };
+    });
+  });
+  ok('a turn-1 shove exists that drowns a crab (offensive verb is available move 1)', !!found);
+  if (found) {
+    var actor = R.byUid(s, found.uid);
+    console.log('     teach move: ' + actor.id + ' @' + actor.c + ',' + actor.r + ' shove ' + found.dir +
+      ' (power ' + found.power + ') → previewShove reports drown(s) ' + JSON.stringify(found.pv.drowns));
+    // resolving that exact move actually kills a crab and stays telegraphed
+    var log = R.resolveTurn(s, { unitUid: found.uid, dir: found.dir, distance: found.power });
+    var crabDrowned = log.some(function (e) { return e.t === 'drown' && e.side === 'enemy'; });
+    ok('resolving the teach move drowns a crab', crabDrowned);
+    ok('the teach move is telegraphed (invariant holds)', (function () { try { return R.assertTelegraphed(log); } catch (e) { return false; } })());
+  }
+})();
+
+console.log('\n== STAKES: encounter 1 is WINNABLE (a thoughtful clear exists) AND LOSABLE (careless drowns crew) ==');
+(function () {
+  var DATA = require('../js/data.js').HJ_DATA;
+  var enc = DATA.ENCOUNTERS[0];
+  // WINNABLE: a greedy "drown-if-you-can, else move safely" line clears the board
+  (function () {
+    var s = R.newState(enc, { seed: 1 });
+    var won = false;
+    for (var t = 0; t < 16 && !won; t++) {
+      if (R.enemiesAlive(s) === 0) { won = true; break; }
+      if (R.crewAlive(s) === 0) break;
+      var pick = null;
+      var crew = s.crew.filter(function (u) { return u.alive; });
+      // prefer a move that drowns an enemy without losing crew
+      crew.forEach(function (u) {
+        ['up', 'down', 'left', 'right'].forEach(function (d) {
+          var pv = R.previewShove(s, u._uid, d, u.power);
+          if (!pv || pv.blocked || !pv.moves.length) return;
+          var e = pv.drowns.some(function (uid) { var x = R.byUid(s, uid); return x && x._side === 'enemy'; });
+          var c = pv.drowns.some(function (uid) { var x = R.byUid(s, uid); return x && x._side === 'crew'; });
+          if (e && !c && !pick) pick = { u: u._uid, d: d, p: u.power };
+        });
+      });
+      if (!pick) { // else any legal move that doesn't drown crew
+        crew.forEach(function (u) {
+          ['up', 'left', 'right', 'down'].forEach(function (d) {
+            if (pick) return;
+            var pv = R.previewShove(s, u._uid, d, u.power);
+            if (!pv || pv.blocked || !pv.moves.length) return;
+            var c = pv.drowns.some(function (uid) { var x = R.byUid(s, uid); return x && x._side === 'crew'; });
+            if (!c) pick = { u: u._uid, d: d, p: u.power };
+          });
+        });
+      }
+      if (!pick) pick = { u: crew[0]._uid, d: 'up', p: crew[0].power };
+      var log = R.resolveTurn(s, { unitUid: pick.u, dir: pick.d, distance: pick.p });
+      try { R.assertTelegraphed(log); } catch (e) { fail++; console.log('   !! ' + e.message); }
+    }
+    ok('encounter 1 is winnable (thoughtful clear exists)', won && R.crewAlive(s) >= 1);
+  })();
+  // LOSABLE: a careless line (always shove DOWN, ignore threats) gets crew drowned
+  (function () {
+    var s = R.newState(enc, { seed: 1 });
+    for (var t = 0; t < 14; t++) {
+      if (R.crewAlive(s) === 0 || R.enemiesAlive(s) === 0) break;
+      var u = s.crew.find(function (x) { return x.alive; });
+      var log = R.resolveTurn(s, { unitUid: u._uid, dir: 'down', distance: u.power });
+      try { R.assertTelegraphed(log); } catch (e) { fail++; console.log('   !! ' + e.message); }
+    }
+    ok('encounter 1 is losable (a careless line drowns crew)', R.crewAlive(s) < 3);
+  })();
+})();
+
 console.log('\n----------------------------------------');
 console.log('PASS: ' + pass + '   FAIL: ' + fail);
 process.exit(fail ? 1 : 0);
