@@ -1,0 +1,15 @@
+{
+  "name": "Højvande — skub dem i havet",
+  "short_name": "Højvande",
+  "description": "Et roligt, perfekt-information taktikspil: skub fjender ud i det stigende tidevand. Læs deres næste træk, læs vandet, skub klogt.",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0a1a24",
+  "theme_color": "#0a1a24",
+  "icons": [
+    { "src": "assets/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "assets/icon-maskable.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+  ]
+}
