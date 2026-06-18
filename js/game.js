@@ -165,17 +165,18 @@
       var im = cells[it.from[1]][it.from[0]].querySelector('.intent');
       im.classList.add('show', it.kind);
       im.textContent = arrowFor(sign(to[0] - it.from[0]), sign(to[1] - it.from[1]));
-      // mark where the victim lands
-      var vdst = cells[to[1]][to[0]].querySelector('.ghost');
-      vdst.classList.add('show', 'enemy-target');
+      // mark where the victim lands — skip if it's off-board (resolution fizzles such a shove;
+      // the rules engine guards inBounds, so the render path must too)
+      var vrow = cells[to[1]]; var vcell = vrow && vrow[to[0]];
+      if (vcell) { vcell.querySelector('.ghost').classList.add('show', 'enemy-target'); }
       return;
     }
     // step: arrow on the enemy's own tile pointing toward where it moves
     var src = cells[e.r][e.c].querySelector('.intent');
     src.classList.add('show', it.kind);
     src.textContent = arrowFor(sign(to[0] - e.c), sign(to[1] - e.r));
-    var dst = cells[to[1]][to[0]].querySelector('.ghost');
-    dst.classList.add('show', 'enemy-target');
+    var drow = cells[to[1]]; var dcell = drow && drow[to[0]];
+    if (dcell) { dcell.querySelector('.ghost').classList.add('show', 'enemy-target'); }
   }
   function arrowFor(dc, dr) { if (dr < 0) return '↑'; if (dr > 0) return '↓'; if (dc < 0) return '←'; if (dc > 0) return '→'; return '·'; }
   function sign(n) { return n > 0 ? 1 : n < 0 ? -1 : 0; }
