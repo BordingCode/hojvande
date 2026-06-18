@@ -1,12 +1,12 @@
 /* HØJVANDE service worker. Network-first for navigations & JS (fresh deploys),
    cache-first-with-revalidate for other assets. Bump CACHE on every shippable change. */
-const CACHE = 'hojvande-v2';
+const CACHE = 'hojvande-v3';
 const ASSETS = [
   './',
   './index.html',
   './manifest.json',
   './css/style.css?v=1',
-  './js/data.js?v=1',
+  './js/data.js?v=2',
   './js/rules.js?v=1',
   './js/audio.js?v=1',
   './js/game.js?v=2',

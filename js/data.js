@@ -39,7 +39,7 @@
   // tide: starting flood ring schedule. `floodStart` = turn the first ring floods.
   // Enemies given as [enemyId, col, row]. Crew spawn columns chosen by the engine on row 4.
   const ENCOUNTERS = [
-    { name: 'Lavvande',   tideStart: 3, tideEvery: 2, enemies: [['crab', 1, 1], ['crab', 3, 0]] },
+    { name: 'Lavvande',   tideStart: 4, tideEvery: 2, enemies: [['crab', 1, 2], ['crab', 3, 2]] },
     { name: 'Strøms.',    tideStart: 3, tideEvery: 2, enemies: [['crab', 0, 1], ['lurker', 4, 1], ['crab', 2, 0]] },
     { name: 'Brænding',   tideStart: 2, tideEvery: 2, enemies: [['brute', 2, 1], ['crab', 0, 0], ['lurker', 4, 0]] },
     { name: 'Revlen',     tideStart: 2, tideEvery: 2, enemies: [['hulk', 2, 2], ['brute', 0, 1], ['crab', 4, 1], ['lurker', 1, 0]] },
