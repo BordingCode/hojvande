@@ -1,6 +1,6 @@
 /* HØJVANDE service worker. Network-first for navigations & JS (fresh deploys),
    cache-first-with-revalidate for other assets. Bump CACHE on every shippable change. */
-const CACHE = 'hojvande-v4';
+const CACHE = 'hojvande-v5';
 const ASSETS = [
   './',
   './index.html',

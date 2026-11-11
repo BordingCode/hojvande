@@ -75,6 +75,6 @@
     }
   </script>
   <!-- hub-stats visit counter -->
-  <script>(function(){try{var A="hojvande",K="hubdev",d=localStorage.getItem(K);if(!d){d=(self.crypto&&crypto.randomUUID?crypto.randomUUID():Date.now()+"."+Math.random().toString(36).slice(2));localStorage.setItem(K,d);}var u="https://hub-stats.mathiasjob.workers.dev/hit",b=JSON.stringify({app:A,d:d});if(navigator.sendBeacon){navigator.sendBeacon(u,b);}else{fetch(u,{method:"POST",body:b,keepalive:true,mode:"no-cors"});}}catch(e){}})();</script>
+  <script>(function(){try{var A="hojvande",K="hubdev",d=localStorage.getItem(K);if(!d){d=(self.crypto&&crypto.randomUUID?crypto.randomUUID():Date.now()+"."+Math.random().toString(36).slice(2));localStorage.setItem(K,d);}var u="https://hub-stats.mathiasjob.workers.dev/hit",R=(function(){try{var x=document.referrer;if(!x)return"";x=new URL(x);var h=location.host;if(x.host!==h)return x.host;if(/\.github\.io$/.test(h)){var s=x.pathname.split("/")[1]||"",m=location.pathname.split("/")[1]||"";return s===m?"self":h+"/"+s;}return"self";}catch(e){return""}})(),b=JSON.stringify({app:A,d:d,r:R});if(navigator.sendBeacon){navigator.sendBeacon(u,b);}else{fetch(u,{method:"POST",body:b,keepalive:true,mode:"no-cors"});}}catch(e){}})();</script>
 </body>
 </html>
